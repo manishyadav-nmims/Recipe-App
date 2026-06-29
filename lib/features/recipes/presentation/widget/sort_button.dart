@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:recipeapp/features/theme/app_theme.dart';
 import '../bloc/recipe_bloc.dart';
 import '../bloc/recipe_event.dart';
-import '../bloc/recipe_state.dart';
 
 class SortButton extends StatelessWidget {
   final SortOption currentSort;
@@ -93,9 +92,6 @@ class SortButton extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Bottom Sheet
-// ─────────────────────────────────────────────────────────────────────────────
 class _SortSheet extends StatefulWidget {
   final SortOption current;
   final ValueChanged<SortOption> onSelected;
@@ -202,9 +198,6 @@ class _SortSheetState extends State<_SortSheet> {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Option Tile
-// ─────────────────────────────────────────────────────────────────────────────
 class _OptionTile extends StatelessWidget {
   final _SortOptionMeta option;
   final bool isSelected;
@@ -284,9 +277,6 @@ class _OptionTile extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Meta
-// ─────────────────────────────────────────────────────────────────────────────
 class _SortOptionMeta {
   final SortOption value;
   final String label;

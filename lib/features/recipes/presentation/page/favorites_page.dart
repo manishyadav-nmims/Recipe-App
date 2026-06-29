@@ -44,7 +44,6 @@ class _FavoritesPageState extends State<FavoritesPage> {
               icon: Icons.favorite_border,
               actionLabel: 'Browse Recipes',
               onAction: () {
-                context.read<RecipeBloc>().add( LoadRecipesEvent());
                 context.pop();
               },
             );

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:recipeapp/features/auth/presentation/pages/login_page.dart';
 import 'package:recipeapp/features/splash/splash_page.dart';
 import '../../features/recipes/presentation/bloc/recipe_bloc.dart';
+import '../../features/recipes/presentation/bloc/recipe_event.dart';
 import '../../features/recipes/presentation/page/recipe_detail_page.dart';
 import '../../features/recipes/presentation/page/recipe_list_page.dart';
 import '../../features/recipes/presentation/page/favorites_page.dart';
@@ -49,8 +50,13 @@ class AppRouter {
           ],
         ),
         GoRoute(
-          path: favorites,
-          builder: (context, state) => const FavoritesPage(),
+          path: AppRouter.favorites,
+          builder: (context, state) {
+            return BlocProvider(
+              create: (_) => di.sl<RecipeBloc>()..add(LoadFavoritesEvent()),
+              child: const FavoritesPage(),
+            );
+          },
         ),
       ],
     );
