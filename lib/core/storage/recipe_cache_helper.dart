@@ -1,9 +1,6 @@
 import 'package:hive_ce/hive.dart';
 import 'package:recipeapp/features/recipes/data/models/recipe_model.dart';
 
-/// Thin wrapper around two Hive boxes:
-///   • 'recipes'   – cached API data (List of recipe maps)
-///   • 'favorites' – list of favorited recipe ids
 class RecipeCacheHelper {
   static const _recipesBox = 'recipes';
   static const _favoritesBox = 'favorites';

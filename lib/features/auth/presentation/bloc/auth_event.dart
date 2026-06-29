@@ -10,4 +10,6 @@ class LoginEvent extends AuthEvent {
   });
 }
 
-class LogoutEvent extends AuthEvent {}
+class LogoutEvent extends AuthEvent {
+
+}

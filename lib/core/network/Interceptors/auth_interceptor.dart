@@ -13,8 +13,8 @@ class AuthInterceptor extends Interceptor {
     final refresh = await SecureTokenStorage.getRefreshToken();
     final access = await SecureTokenStorage.getAccessToken();
 
-    if (refresh != null) options.headers['x-refresh-token'] = refresh;
-    if (access != null) options.headers['x-access-token'] = access;
+    if (refresh != null) options.headers['refresh-token'] = refresh;
+    if (access != null) options.headers['access-token'] = access;
 
     handler.next(options);
   }
@@ -22,8 +22,8 @@ class AuthInterceptor extends Interceptor {
   @override
   Future<void> onResponse(Response response,
       ResponseInterceptorHandler handler,) async {
-    final accessHeader = response.headers.value('x-access-token');
-    final refreshHeader = response.headers.value('x-refresh-token');
+    final accessHeader = response.headers.value('access-token');
+    final refreshHeader = response.headers.value('refresh-token');
 
     if (accessHeader != null) {
       final oldRefreshToken = await SecureTokenStorage.getRefreshToken();

@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:recipeapp/core/storage/user_local_storage.dart';
+import '../../../../core/network/secure_token_storage.dart';
+import '../../../../core/router/app_router.dart';
 import '../../../theme/app_theme.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../auth/presentation/bloc/auth_event.dart';
@@ -115,59 +119,6 @@ class _DrawerHeader extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _DrawerTile extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final bool isDark;
-  final VoidCallback onTap;
-
-  const _DrawerTile({
-    required this.icon,
-    required this.label,
-    required this.isDark,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final textColor =
-    isDark ? Colors.white.withOpacity(0.9) : const Color(0xFF1A1A2E);
-    final iconColor = AppTheme.primaryColor;
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-      child: Material(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(14),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(14),
-          onTap: onTap,
-          splashColor: AppTheme.primaryColor.withOpacity(0.12),
-          highlightColor: AppTheme.primaryColor.withOpacity(0.07),
-          child: Padding(
-            padding:
-            const EdgeInsets.symmetric(horizontal: 12, vertical: 13),
-            child: Row(
-              children: [
-                Icon(icon, color: iconColor, size: 22),
-                const SizedBox(width: 14),
-                Text(
-                  label,
-                  style: TextStyle(
-                    color: textColor,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
       ),
     );
   }
@@ -388,12 +339,12 @@ class _LogoutSheet extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    parentContext
-                        .read<AuthBloc>()
-                        .add(LogoutEvent());
-                  },
+                      onPressed: () async {
+                      Navigator.pop(context);
+                      await SecureTokenStorage.clear();
+                      await UserLocalStorage.clearUser();
+                      context.go(AppRouter.login);
+                      },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppTheme.errorColor,
                     foregroundColor: Colors.white,
