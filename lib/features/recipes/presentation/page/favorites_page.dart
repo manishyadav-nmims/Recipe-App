@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:recipeapp/core/utils/connectivity_mixin.dart';
+import 'package:recipeapp/features/theme/app_theme.dart';
 import '../bloc/recipe_bloc.dart';
 import '../bloc/recipe_event.dart';
 import '../bloc/recipe_state.dart';
@@ -15,7 +17,7 @@ class FavoritesPage extends StatefulWidget {
   State<FavoritesPage> createState() => _FavoritesPageState();
 }
 
-class _FavoritesPageState extends State<FavoritesPage> {
+class _FavoritesPageState extends State<FavoritesPage> with ConnectivityMixin {
   @override
   void initState() {
     super.initState();
@@ -50,26 +52,39 @@ class _FavoritesPageState extends State<FavoritesPage> {
           }
 
           if (state is RecipeLoadedState) {
-            return GridView.builder(
-              padding: const EdgeInsets.all(16),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 0.72,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
-              ),
-              itemCount: state.recipes.length,
-              itemBuilder: (context, index) {
-                final recipe = state.recipes[index];
-                return RecipeCard(
-                  recipe: recipe,
-                  isFavorite: state.favoriteIds.contains(recipe.id),
-                  onTap: () => context.push('/recipes/${recipe.id}'),
-                  onFavorite: () => context
-                      .read<RecipeBloc>()
-                      .add(ToggleFavoriteEvent(recipe.id)),
-                );
+            return RefreshIndicator(
+              onRefresh: () async {
+                final isOnline = await checkConnectivity();
+                if (!isOnline) {
+                  showOfflineBanner(
+                    subtitle: 'Favourites are saved offline — no refresh needed.',
+                  );
+                  return;
+                }
+                hideOfflineBanner();
+                context.read<RecipeBloc>().add(LoadFavoritesEvent());
               },
+              child: GridView.builder(
+                padding: const EdgeInsets.all(16),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  childAspectRatio: 0.72,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                ),
+                itemCount: state.recipes.length,
+                itemBuilder: (context, index) {
+                  final recipe = state.recipes[index];
+                  return RecipeCard(
+                    recipe: recipe,
+                    isFavorite: state.favoriteIds.contains(recipe.id),
+                    onTap: () => context.push('/recipes/${recipe.id}'),
+                    onFavorite: () => context
+                        .read<RecipeBloc>()
+                        .add(ToggleFavoriteEvent(recipe.id)),
+                  );
+                },
+              ),
             );
           }
 

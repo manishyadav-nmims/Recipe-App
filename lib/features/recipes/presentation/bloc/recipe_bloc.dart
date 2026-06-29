@@ -74,8 +74,8 @@ class RecipeBloc extends Bloc<RecipeEvent, RecipeState> {
             recipes: _sorted(cached, SortOption.rating),
             allRecipes: cached,
             favoriteIds: favIds,
-            hasMore: false,
-            isOffline: true,
+            hasMore: false,      // ← already there, but double-check this is false
+            isOffline: true,     // ← this must be true
           ));
         } else {
           emit(RecipeErrorState(message));
@@ -89,6 +89,9 @@ class RecipeBloc extends Bloc<RecipeEvent, RecipeState> {
       ) async {
     final current = state;
     if (current is! RecipeLoadedState || !current.hasMore) return;
+
+    // ← Add this: don't paginate when offline
+    if (current.isOffline) return;
 
     emit(RecipeLoadingMoreState(
       currentRecipes: current.recipes,
@@ -111,7 +114,8 @@ class RecipeBloc extends Bloc<RecipeEvent, RecipeState> {
           currentSkip: current.currentSkip + data.length,
         ));
       case ApiFailure():
-        emit(current);
+      // ← Also set hasMore false on failure so scroll stops retrying
+        emit(current.copyWith(hasMore: false));
     }
   }
 

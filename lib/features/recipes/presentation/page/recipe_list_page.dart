@@ -1,6 +1,8 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:recipeapp/core/utils/connectivity_mixin.dart';
 import 'package:recipeapp/features/theme/app_theme.dart';
 import 'package:recipeapp/features/theme/bloc/theme_event.dart';
 import '../../../../../core/router/app_router.dart';
@@ -23,7 +25,7 @@ class RecipeListPage extends StatefulWidget {
   State<RecipeListPage> createState() => _RecipeListPageState();
 }
 
-class _RecipeListPageState extends State<RecipeListPage> {
+class _RecipeListPageState extends State<RecipeListPage> with ConnectivityMixin {
   final _searchController = TextEditingController();
   final _scrollController = ScrollController();
   bool _isSearching = false;
@@ -73,7 +75,6 @@ class _RecipeListPageState extends State<RecipeListPage> {
         ),
 
         appBar: AppBar(
-          // Hamburger auto-appears because we added a drawer ↑
           title: _isSearching
               ? _buildSearchField()
               : const Text('RecipeHub 🍳'),
@@ -211,6 +212,12 @@ class _RecipeListPageState extends State<RecipeListPage> {
   Widget _buildRecipeGrid(RecipeLoadedState state) {
     return RefreshIndicator(
       onRefresh: () async {
+        final isOnline = await checkConnectivity();
+        if (!isOnline) {
+          showOfflineBanner(); // uses default subtitle
+          return;
+        }
+        hideOfflineBanner();
         context.read<RecipeBloc>().add(LoadRecipesEvent(isRefresh: true));
       },
       color: AppTheme.primaryColor,
