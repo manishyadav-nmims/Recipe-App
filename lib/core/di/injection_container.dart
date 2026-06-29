@@ -11,6 +11,7 @@ import '../../features/recipes/data/services/recipe_service.dart';
 import '../../features/recipes/domain/repository/recipe_repository.dart';
 import '../../features/recipes/domain/usecase/get_recipes_usecase.dart';
 import '../../features/recipes/presentation/bloc/recipe_bloc.dart';
+import '../../features/theme/bloc/theme_bloc.dart';
 
 final sl = GetIt.instance;
 
@@ -80,4 +81,5 @@ Future<void> init() async {
   sl.registerFactory<SplashBloc>(
         () => SplashBloc(),
   );
+  sl.registerFactory<ThemeBloc>(() => ThemeBloc());
 }

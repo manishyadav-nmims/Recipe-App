@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:recipeapp/features/auth/presentation/pages/login_page.dart';
 import 'package:recipeapp/features/splash/splash_page.dart';
-import '../../features/home/home.dart';
 import '../../features/recipes/presentation/page/recipe_detail_page.dart';
 import '../../features/recipes/presentation/page/recipe_list_page.dart';
 import '../../features/recipes/presentation/page/favorites_page.dart';

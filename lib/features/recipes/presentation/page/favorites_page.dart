@@ -28,8 +28,8 @@ class _FavoritesPageState extends State<FavoritesPage> {
       appBar: AppBar(
         title: const Text('My Favorites ❤️'),
         leading: BackButton(onPressed: () {
-          context.read<RecipeBloc>().add( LoadRecipesEvent());
           context.pop();
+          context.read<RecipeBloc>().add( LoadRecipesEvent());
         }),
       ),
       body: BlocBuilder<RecipeBloc, RecipeState>(

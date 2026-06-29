@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:recipeapp/features/theme/app_theme.dart';
+import 'package:recipeapp/features/theme/bloc/theme_event.dart';
 import '../../../../../core/router/app_router.dart';
-import '../../../../../core/theme/app_theme.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../auth/presentation/bloc/auth_state.dart';
+import '../../../theme/bloc/theme_bloc.dart';
 import '../bloc/recipe_bloc.dart';
 import '../bloc/recipe_event.dart';
 import '../bloc/recipe_state.dart';
+import '../widget/app_drawer.dart';          // the drawer we created
 import '../widget/error_state_widge.dart';
 import '../widget/recipe_card.dart';
 import '../widget/recipe_skeleton_grid.dart';
@@ -28,7 +31,7 @@ class _RecipeListPageState extends State<RecipeListPage> {
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
-    context.read<RecipeBloc>().add( LoadRecipesEvent());
+    context.read<RecipeBloc>().add(LoadRecipesEvent());
   }
 
   @override
@@ -50,6 +53,9 @@ class _RecipeListPageState extends State<RecipeListPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Read theme state once for the drawer
+    final themeState = context.watch<ThemeBloc>().state;
+
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is AuthUnauthenticatedState) {
@@ -57,9 +63,19 @@ class _RecipeListPageState extends State<RecipeListPage> {
         }
       },
       child: Scaffold(
+        // ── Drawer ──────────────────────────────────────────────────────
+        drawer: AppDrawer(
+          isDarkMode: themeState.isDark,
+          onThemeToggle: (val) {
+            context.read<ThemeBloc>().add(ToggleThemeEvent(val));
+          },
+        ),
+
         appBar: AppBar(
-          title:
-          _isSearching ? _buildSearchField() : const Text('RecipeHub 🍳'),
+          // Hamburger auto-appears because we added a drawer ↑
+          title: _isSearching
+              ? _buildSearchField()
+              : const Text('RecipeHub 🍳'),
           actions: [
             IconButton(
               icon: Icon(_isSearching ? Icons.close : Icons.search),
@@ -73,28 +89,11 @@ class _RecipeListPageState extends State<RecipeListPage> {
             ),
             IconButton(
               icon: const Icon(Icons.favorite_border),
-              onPressed: () => context.go(AppRouter.favorites),
-            ),
-            PopupMenuButton<String>(
-              icon: const Icon(Icons.more_vert),
-              onSelected: (value) {
-                if (value == 'logout') _showLogoutDialog();
-              },
-              itemBuilder: (_) => [
-                const PopupMenuItem(
-                  value: 'logout',
-                  child: Row(
-                    children: [
-                      Icon(Icons.logout, size: 18),
-                      SizedBox(width: 8),
-                      Text('Logout'),
-                    ],
-                  ),
-                ),
-              ],
+              onPressed: () => context.push(AppRouter.favorites),
             ),
           ],
         ),
+
         body: Column(
           children: [
             _buildFilterBar(),
@@ -105,16 +104,13 @@ class _RecipeListPageState extends State<RecipeListPage> {
                       state is RecipeSearchingState) {
                     return const RecipeSkeletonGrid();
                   }
-
                   if (state is RecipeErrorState) {
                     return ErrorStateWidget(
                       message: state.message,
-                      onRetry: () => context
-                          .read<RecipeBloc>()
-                          .add( LoadRecipesEvent()),
+                      onRetry: () =>
+                          context.read<RecipeBloc>().add(LoadRecipesEvent()),
                     );
                   }
-
                   if (state is RecipeEmptyState) {
                     return EmptyStateWidget(
                       message: state.message,
@@ -126,15 +122,12 @@ class _RecipeListPageState extends State<RecipeListPage> {
                       },
                     );
                   }
-
                   if (state is RecipeLoadedState) {
                     return _buildRecipeGrid(state);
                   }
-
                   if (state is RecipeLoadingMoreState) {
                     return _buildRecipeGridWithLoader(state);
                   }
-
                   return const SizedBox.shrink();
                 },
               ),
@@ -169,8 +162,8 @@ class _RecipeListPageState extends State<RecipeListPage> {
       builder: (context, state) {
         if (state is! RecipeLoadedState) return const SizedBox.shrink();
 
-        final cuisines = state.allRecipes.map((r) => r.cuisine).toSet().toList()
-          ..sort();
+        final cuisines =
+        state.allRecipes.map((r) => r.cuisine).toSet().toList()..sort();
 
         return Column(
           children: [
@@ -189,7 +182,7 @@ class _RecipeListPageState extends State<RecipeListPage> {
                     selected: state.selectedCuisine == null,
                     onSelected: (_) => context
                         .read<RecipeBloc>()
-                        .add( FilterRecipesByCuisineEvent(null)),
+                        .add(FilterRecipesByCuisineEvent(null)),
                     selectedColor: AppTheme.primaryColor.withOpacity(0.2),
                   ),
                   const SizedBox(width: 8),
@@ -201,7 +194,8 @@ class _RecipeListPageState extends State<RecipeListPage> {
                       onSelected: (_) => context
                           .read<RecipeBloc>()
                           .add(FilterRecipesByCuisineEvent(cuisine)),
-                      selectedColor: AppTheme.primaryColor.withOpacity(0.2),
+                      selectedColor:
+                      AppTheme.primaryColor.withOpacity(0.2),
                     ),
                   )),
                 ],
@@ -216,10 +210,7 @@ class _RecipeListPageState extends State<RecipeListPage> {
   Widget _buildRecipeGrid(RecipeLoadedState state) {
     return RefreshIndicator(
       onRefresh: () async {
-        context
-            .read<RecipeBloc>()
-            .add( LoadRecipesEvent(isRefresh: true));
-        await Future.delayed(const Duration(seconds: 1));
+        context.read<RecipeBloc>().add(LoadRecipesEvent(isRefresh: true));
       },
       color: AppTheme.primaryColor,
       child: GridView.builder(
@@ -228,8 +219,8 @@ class _RecipeListPageState extends State<RecipeListPage> {
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
           childAspectRatio: 0.72,
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 12,
+          crossAxisSpacing: 5,
+          mainAxisSpacing: 5,
         ),
         itemCount: state.recipes.length,
         itemBuilder: (context, index) {
@@ -237,10 +228,9 @@ class _RecipeListPageState extends State<RecipeListPage> {
           return RecipeCard(
             recipe: recipe,
             isFavorite: state.favoriteIds.contains(recipe.id),
-            onTap: () => context.go('/recipes/${recipe.id}'),
-            onFavorite: () => context
-                .read<RecipeBloc>()
-                .add(ToggleFavoriteEvent(recipe.id)),
+            onTap: () => context.push('/recipes/${recipe.id}'),
+            onFavorite: () =>
+                context.read<RecipeBloc>().add(ToggleFavoriteEvent(recipe.id)),
           );
         },
       ),
@@ -254,10 +244,9 @@ class _RecipeListPageState extends State<RecipeListPage> {
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         childAspectRatio: 0.72,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
+        crossAxisSpacing: 5,
+        mainAxisSpacing: 5,
       ),
-      // +2 skeleton cards at the bottom while loading
       itemCount: state.currentRecipes.length + 2,
       itemBuilder: (context, index) {
         if (index >= state.currentRecipes.length) {
@@ -267,46 +256,20 @@ class _RecipeListPageState extends State<RecipeListPage> {
         return RecipeCard(
           recipe: recipe,
           isFavorite: state.favoriteIds.contains(recipe.id),
-          onTap: () => context.go('/recipes/${recipe.id}'),
-          onFavorite: () => context
-              .read<RecipeBloc>()
-              .add(ToggleFavoriteEvent(recipe.id)),
+          onTap: () => context.push('/recipes/${recipe.id}'),
+          onFavorite: () =>
+              context.read<RecipeBloc>().add(ToggleFavoriteEvent(recipe.id)),
         );
       },
     );
   }
-
-  void _showLogoutDialog() {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Logout'),
-        content: const Text('Are you sure you want to logout?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-             /* Navigator.pop(context);
-              context.read<AuthBloc>().add(AuthLogoutEvent());*/
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.errorColor,
-              minimumSize: const Size(0, 44),
-            ),
-            child: const Text('Logout'),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Sort Button (unchanged)
+// ─────────────────────────────────────────────────────────────────────────────
 class _SortButton extends StatelessWidget {
   final SortOption currentSort;
-
   const _SortButton({required this.currentSort});
 
   @override
@@ -316,10 +279,13 @@ class _SortButton extends StatelessWidget {
       onSelected: (option) =>
           context.read<RecipeBloc>().add(SortRecipesEvent(option)),
       itemBuilder: (_) => const [
-        PopupMenuItem(value: SortOption.rating, child: Text('⭐ Highest Rating')),
+        PopupMenuItem(
+            value: SortOption.rating, child: Text('⭐ Highest Rating')),
         PopupMenuItem(value: SortOption.name, child: Text('🔤 Name A-Z')),
-        PopupMenuItem(value: SortOption.cookTime, child: Text('⏱ Cook Time')),
-        PopupMenuItem(value: SortOption.calories, child: Text('🔥 Calories')),
+        PopupMenuItem(
+            value: SortOption.cookTime, child: Text('⏱ Cook Time')),
+        PopupMenuItem(
+            value: SortOption.calories, child: Text('🔥 Calories')),
       ],
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),

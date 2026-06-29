@@ -2,8 +2,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:go_router/go_router.dart';
 
-import '../../../../core/theme/app_theme.dart';
+import '../../../theme/app_theme.dart';
 import '../../domain/entities/recipe_entity.dart';
 import '../bloc/recipe_bloc.dart';
 import '../bloc/recipe_event.dart';
@@ -70,7 +71,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
               Icons.arrow_back_ios,
               color: Colors.white,
             ),
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => context.pop(),
           ),
 
           actions: [

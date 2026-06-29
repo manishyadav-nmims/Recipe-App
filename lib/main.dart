@@ -10,6 +10,7 @@ import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'core/storage/recipe_cache_helper.dart';
 import 'core/storage/user_local_storage.dart';
 import 'features/recipes/presentation/bloc/recipe_bloc.dart';
+import 'features/theme/bloc/theme_bloc.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,6 +28,7 @@ void main() async {
   final authBloc = di.sl<AuthBloc>();
   final splashBloc = di.sl<SplashBloc>();
   final recipeBloc = di.sl<RecipeBloc>();
+  final themeBloc = di.sl<ThemeBloc>();
 
   runApp(
     MultiBlocProvider(
@@ -34,6 +36,7 @@ void main() async {
         BlocProvider<AuthBloc>(create: (_) => authBloc),
         BlocProvider<RecipeBloc>(create: (_) => recipeBloc),
         BlocProvider<SplashBloc>(create: (_) => splashBloc),
+        BlocProvider<ThemeBloc>(create: (_) => themeBloc),
       ],
       child: App(),
     ),

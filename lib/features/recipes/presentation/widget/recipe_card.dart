@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../../recipes/domain/entities/recipe_entity.dart';
-import '../../../../core/theme/app_theme.dart';
+import '../../../theme/app_theme.dart';
 
 class RecipeCard extends StatelessWidget {
   final RecipeEntity recipe;
@@ -66,13 +66,13 @@ class RecipeCard extends StatelessWidget {
             ),
             // Content
             Padding(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(10),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     recipe.name,
-                    style: theme.textTheme.titleMedium?.copyWith(
+                    style: theme.textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                     maxLines: 2,
@@ -86,14 +86,13 @@ class RecipeCard extends StatelessWidget {
                       const SizedBox(width: 4),
                       Text(
                         recipe.cuisine,
-                        style: theme.textTheme.bodySmall?.copyWith(
+                        style: theme.textTheme.labelMedium?.copyWith(
                           color: Colors.grey[600],
                         ),
                       ),
-
                     ],
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 2),
                   Row(
                     children: [
                       const Icon(Icons.access_time,
@@ -101,13 +100,12 @@ class RecipeCard extends StatelessWidget {
                       const SizedBox(width: 4),
                       Text(
                         '${recipe.totalTimeMinutes} min',
-                        style: theme.textTheme.bodySmall?.copyWith(
+                        style: theme.textTheme.labelMedium?.copyWith(
                           color: Colors.grey[600],
                         ),
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 8),
                   Row(
                     children: [
