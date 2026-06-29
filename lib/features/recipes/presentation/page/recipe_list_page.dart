@@ -10,10 +10,11 @@ import '../../../theme/bloc/theme_bloc.dart';
 import '../bloc/recipe_bloc.dart';
 import '../bloc/recipe_event.dart';
 import '../bloc/recipe_state.dart';
-import '../widget/app_drawer.dart';          // the drawer we created
+import '../widget/app_drawer.dart';
 import '../widget/error_state_widge.dart';
 import '../widget/recipe_card.dart';
 import '../widget/recipe_skeleton_grid.dart';
+import '../widget/sort_button.dart';
 
 class RecipeListPage extends StatefulWidget {
   const RecipeListPage({super.key});
@@ -175,7 +176,7 @@ class _RecipeListPageState extends State<RecipeListPage> {
                 padding:
                 const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 children: [
-                  _SortButton(currentSort: state.sortOption),
+                  SortButton(currentSort: state.sortOption),
                   const SizedBox(width: 8),
                   FilterChip(
                     label: const Text('All'),
@@ -261,47 +262,6 @@ class _RecipeListPageState extends State<RecipeListPage> {
               context.read<RecipeBloc>().add(ToggleFavoriteEvent(recipe.id)),
         );
       },
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Sort Button (unchanged)
-// ─────────────────────────────────────────────────────────────────────────────
-class _SortButton extends StatelessWidget {
-  final SortOption currentSort;
-  const _SortButton({required this.currentSort});
-
-  @override
-  Widget build(BuildContext context) {
-    return PopupMenuButton<SortOption>(
-      initialValue: currentSort,
-      onSelected: (option) =>
-          context.read<RecipeBloc>().add(SortRecipesEvent(option)),
-      itemBuilder: (_) => const [
-        PopupMenuItem(
-            value: SortOption.rating, child: Text('⭐ Highest Rating')),
-        PopupMenuItem(value: SortOption.name, child: Text('🔤 Name A-Z')),
-        PopupMenuItem(
-            value: SortOption.cookTime, child: Text('⏱ Cook Time')),
-        PopupMenuItem(
-            value: SortOption.calories, child: Text('🔥 Calories')),
-      ],
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey[300]!),
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: const Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.sort, size: 16),
-            SizedBox(width: 4),
-            Text('Sort', style: TextStyle(fontSize: 13)),
-          ],
-        ),
-      ),
     );
   }
 }

@@ -40,6 +40,9 @@ class RecipeBloc extends Bloc<RecipeEvent, RecipeState> {
     on<LoadFavoritesEvent>(_onLoadFavorites);
   }
 
+  List<RecipeEntity> _cachedAllRecipes = [];
+  List<int> _cachedFavoriteIds = [];
+
   Future<void> _onLoadRecipes(
       LoadRecipesEvent event,
       Emitter<RecipeState> emit,
@@ -55,6 +58,7 @@ class RecipeBloc extends Bloc<RecipeEvent, RecipeState> {
           emit(RecipeEmptyState('No recipes found.'));
           return;
         }
+        _cachedAllRecipes = data;
         emit(RecipeLoadedState(
           recipes: _sorted(data, SortOption.rating),
           allRecipes: data,
@@ -65,6 +69,7 @@ class RecipeBloc extends Bloc<RecipeEvent, RecipeState> {
       case ApiFailure(:final message):
         final cached = await _getCachedRecipes();
         if (cached.isNotEmpty) {
+          _cachedAllRecipes = cached;
           emit(RecipeLoadedState(
             recipes: _sorted(cached, SortOption.rating),
             allRecipes: cached,
@@ -98,6 +103,7 @@ class RecipeBloc extends Bloc<RecipeEvent, RecipeState> {
     switch (response) {
       case ApiSuccess(:final data):
         final merged = [...current.allRecipes, ...data];
+        _cachedAllRecipes = merged;
         emit(current.copyWith(
           recipes: _sorted(merged, current.sortOption),
           allRecipes: merged,
@@ -162,7 +168,19 @@ class RecipeBloc extends Bloc<RecipeEvent, RecipeState> {
   }
 
   void _onClearSearch(ClearSearchEvent event, Emitter<RecipeState> emit) {
-    add(LoadRecipesEvent());
+    if (_cachedAllRecipes.isNotEmpty) {
+      // Restore instantly from memory — zero API calls
+      emit(RecipeLoadedState(
+        recipes: _sorted(_cachedAllRecipes, SortOption.rating),
+        allRecipes: _cachedAllRecipes,
+        favoriteIds: _cachedFavoriteIds,
+        hasMore: true, // let the user scroll to load more
+        currentSkip: _cachedAllRecipes.length,
+      ));
+    } else {
+      // Nothing cached yet, fall back to API
+      add(LoadRecipesEvent());
+    }
   }
 
   void _onFilter(FilterRecipesByCuisineEvent event, Emitter<RecipeState> emit) {
