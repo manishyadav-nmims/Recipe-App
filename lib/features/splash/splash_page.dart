@@ -53,7 +53,7 @@ class _SplashPageState extends State<SplashPage>
     return BlocListener<SplashBloc, SplashState>(
       listener: (context, state) {
         if (state is SplashAuthenticated) {
-          context.go(AppRouter.home);
+          context.go(AppRouter.recipes);
         } else if (state is SplashUnauthenticated) {
           context.go(AppRouter.login);
         }

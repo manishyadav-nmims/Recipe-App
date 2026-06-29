@@ -7,7 +7,9 @@ import 'package:recipeapp/features/splash/bloc/splash_bloc.dart';
 import 'core/di/injection_container.dart' as di;
 import 'package:recipeapp/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
+import 'core/storage/recipe_cache_helper.dart';
 import 'core/storage/user_local_storage.dart';
+import 'features/recipes/presentation/bloc/recipe_bloc.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,15 +21,18 @@ void main() async {
   await Hive.initFlutter();
   Hive.registerAdapter(UserHiveModelAdapter()); // generated adapter
   await UserLocalStorage.init();
+  await RecipeCacheHelper.init();
 
   await di.init();
   final authBloc = di.sl<AuthBloc>();
   final splashBloc = di.sl<SplashBloc>();
+  final recipeBloc = di.sl<RecipeBloc>();
 
   runApp(
     MultiBlocProvider(
       providers: [
         BlocProvider<AuthBloc>(create: (_) => authBloc),
+        BlocProvider<RecipeBloc>(create: (_) => recipeBloc),
         BlocProvider<SplashBloc>(create: (_) => splashBloc),
       ],
       child: App(),

@@ -1,6 +1,4 @@
-import 'package:equatable/equatable.dart';
-
-class RecipeEntity extends Equatable {
+class RecipeEntity {
   final int id;
   final String name;
   final List<String> ingredients;
@@ -12,7 +10,6 @@ class RecipeEntity extends Equatable {
   final String cuisine;
   final double caloriesPerServing;
   final List<String> tags;
-  final int userId;
   final String image;
   final double rating;
   final int reviewCount;
@@ -30,7 +27,6 @@ class RecipeEntity extends Equatable {
     required this.cuisine,
     required this.caloriesPerServing,
     required this.tags,
-    required this.userId,
     required this.image,
     required this.rating,
     required this.reviewCount,
@@ -38,24 +34,4 @@ class RecipeEntity extends Equatable {
   });
 
   int get totalTimeMinutes => prepTimeMinutes + cookTimeMinutes;
-
-  @override
-  List<Object?> get props => [
-    id,
-    name,
-    ingredients,
-    instructions,
-    prepTimeMinutes,
-    cookTimeMinutes,
-    servings,
-    difficulty,
-    cuisine,
-    caloriesPerServing,
-    tags,
-    userId,
-    image,
-    rating,
-    reviewCount,
-    mealType,
-  ];
 }
