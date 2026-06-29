@@ -16,8 +16,8 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
-  final _usernameController = TextEditingController(text: 'emilys');
-  final _passwordController = TextEditingController(text: 'emilyspass');
+  final _usernameController = TextEditingController();
+  final _passwordController = TextEditingController();
   bool _obscurePassword = true;
 
   @override
@@ -201,14 +201,7 @@ class _LoginPageState extends State<LoginPage> {
                             : const Text('Sign In'),
                       ),
                     ),
-                    const SizedBox(height: 24),
-                    Center(
-                      child: Text(
-                        'Powered by DummyJSON API',
-                        style:
-                        TextStyle(color: Colors.grey[400], fontSize: 12),
-                      ),
-                    ),
+
                   ],
                 ),
               ),
